@@ -1174,6 +1174,7 @@ class EconomicAgent(models.Model):
         return flattened_children_by_association(self, aas, [])
 
     def with_all_associations(self):
+        # this gets same results as related_all_agents?
         from valuenetwork.valueaccounting.utils import group_dfs_by_has_associate, group_dfs_by_is_associate
         if self.is_individual():
             agents = [self,]
@@ -1214,6 +1215,7 @@ class EconomicAgent(models.Model):
         return list(set([a for a in agents if a.is_context]))
 
     def related_all_agents(self, childs=True):
+        # this gets same results as with_all_associations?
         agents = [ag.has_associate for ag in self.is_associate_of.all()]
         # get also parents of parents contexts
         grand_parents = []
@@ -1228,9 +1230,9 @@ class EconomicAgent(models.Model):
         for agn in grand_parents:
           grandgrand_parents.extend([ag.has_associate for ag in agn.is_associate_of.all()])
         agents.extend(grandgrand_parents)
-        ocp = EconomicAgent.objects.root_ocp_agent()
-        if not ocp in agents:
-            agents.extend([ocp])
+        #ocp = EconomicAgent.objects.root_ocp_agent()
+        #f not ocp in agents:
+        #    agents.extend([ocp])
         return list(set(agents))
 
     def related_context_queryset(self):
@@ -5304,7 +5306,7 @@ class EconomicResource(models.Model):
         ordering = ('resource_type', 'identifier',)
 
     def __unicode__(self):
-        id_str = self.identifier or str(self.id)
+        id_str = self.identifier
         rt_name = self.resource_type.name
         if self.stage:
             rt_name = "@".join([rt_name, self.stage.name])

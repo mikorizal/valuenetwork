@@ -19,7 +19,7 @@
         {% include "_messages.html" %}
 	<div id="connections" >
 		<ul>
-		    <li id="l1" >Something <button id="c1" class="btn btn-info btn-mini" >{% trans "Connections" %}</button> </li>
+		    <li id="l1" >{{ focus }} <button id="{{ focus.id }}" class="btn btn-info btn-mini" >{% trans "Connections" %}</button> </li>
 		</ul>
 
 
@@ -45,7 +45,7 @@
 	{
 	    var target = event.target;
 	    var li = target.parentNode;
-	    var nbr = parseInt(target.id[1]);
+	    var nbr = parseInt(target.id);
 	    nbr += 1;
 	    var lid = "#" + li.id;
 	    var nextLid = 'l' + nbr;

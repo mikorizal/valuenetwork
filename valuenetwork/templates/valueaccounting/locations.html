@@ -21,9 +21,11 @@
 	<div>
     <legend>
         {% trans "Locations" %}
+        {% comment %}
         {% if agent %}
             &nbsp;&nbsp;&nbsp;&nbsp; <a href="{% url "create_location" %}">{% trans "Create a new Location" %}</a>
         {% endif %}
+        {% endcomment %}
     </legend>
 
     <div class="row-fluid">
@@ -35,13 +37,13 @@
             <div id="changeLocation">
             </div>
             <div id="agents">
-                <h3>{% trans "Agents at" %} 
+                <h3>{% trans "Providers of" %} 
                     <span id="agentLocation"></span>
                 </h3>
                 <div id="agentList">
                 </div>
             </div>
-            <div id="resources">
+            <div id="resources" style='margin-top: 1em;'>
                 <h3>{% trans "Resources at" %} 
                     <span id="resourceLocation"></span>
                 </h3>
@@ -136,8 +138,13 @@
                     marker.agents.push("{{ agnt.name }}");
                 {% endfor %}
                 marker.resources = [];
+                marker.notes = [];
                 {% for res in loc.resources %}
+                    //var resourceItem = "<li>" + res + "</br>" ;
+                    //resourceItem += "...." + res.notes + "</li>";
+                    //marker.resources.push("{{ resourceItem}}");
                     marker.resources.push("{{ res }}");
+                    marker.notes.push("{{ res.notes|linebreaksbr }}");
                 {% endfor %}
             {% endif %}
         {% endfor %}
@@ -147,9 +154,11 @@
             var location_id = target.location_id
             var agents = target.agents;
             var resources = target.resources;
+            var notes = target.notes;
             
             $("#changeLocation").empty();
             
+            {% comment %}
             {% if agent %}
                 var addAgentUrl = target.addAgentUrl;
                 
@@ -159,40 +168,50 @@
                 $("#changeLocation").append(addAnchor);
                 $("#changeLocation").show();
             {% endif %}
+            {% endcomment %}
             
             
             $("#agentList").empty();
             $("#resourceList").empty();
             
+            
             if (agents.length)
             {  
                 $("#agentLocation").text(target.name);
-                $("#agentList").append("<ul>");
+                $("#agentList").append("<div>");
                 for (var i = 0; i < agents.length; i++) 
                 {
-                    var agentItem = "<li>" + agents[i] + "</li>";
+                    var agentItem = "<div style='margin-left: 1em;' ><h4>" + agents[i] + "</h4></div>";
                     $("#agentList").append(agentItem);
                 }
-                $("#agentList").append("</ul>");
+                $("#agentList").append("</div>");
                 $("#agents").show();
             }
+            
             
             if (resources.length)
             {  
                 $("#resourceLocation").text(target.name);
-                $("#resourceList").append("<ul>");
+                $("#resourceList").append("<div>");
                 for (var i = 0; i < resources.length; i++) 
                 {
-                    var resourceItem = "<li>" + resources[i] + "</li>";
+                    var resource = resources[i];
+                    var note = notes[i];
+                   //var notes = resource.notes;
+                    var resourceItem = "<div style='margin-left: 1em;' ><h4>" + resource + "</h4></div>" ;
+                    resourceItem += "<div style='margin-left: 2em;'>" + note + "</div>" ;
+                    //var resourceItem = "<li>" + resource + "</br>" ;
+                    //resourceItem += "...." + notes + "</li>";
                     $("#resourceList").append(resourceItem);
                 }
-                $("#resourceList").append("</ul>");
+                $("#resourceList").append("</div>");
                 $("#resources").show();
             }
         }
         
         function hideResources(event) {
-            $("#changeLocation").hide();
+            //var resourceItem = "<li>" + resource + "</br>" ;
+            //$("#changeLocation").hide();
             $("#agents").hide();
             $("#resources").hide();
         }

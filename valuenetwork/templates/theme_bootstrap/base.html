@@ -49,6 +49,7 @@
                                                 title="{% trans 'Networks and Projects' %}" 
                                                 >{% trans 'Organization' %}</a>
                                             </li>
+                                            {% comment %}
                                             <li id="demand" >
                                                 <a href="{% url "demand" %}" 
                                                 title="{% trans 'Customer and R&amp;D Orders' %}" 
@@ -59,17 +60,19 @@
                                                 title="{% trans 'Purchasing requirements now, purchasing forms to come' %}" 
                                                 >{% trans 'Supply' %}</a>
                                             </li>
+                                            {% endcomment %}
                                             <li id="inventory" >
                                                 <a href="{% url "inventory" %}" 
                                                 title="{% trans 'Available resources with their histories' %}"  
-                                                >{% trans 'Inventory' %}</a>
+                                                >{% trans 'Resources' %}</a>
                                             </li>
+                                            {% comment %}
                                             <li id="distribution" >
                                                 <a href="{% url "value_equations" %}" 
                                                 title="{% trans 'Value Equations and income distributions' %}" 
                                                 >{% trans 'Distribution' %}</a>
                                             </li>
-                                            
+                                            {% endcomment %}
                                             {% if request.user.is_authenticated %}
                                                 <li id="my-work" >
                                                     <a href="{% url "start" %}"  

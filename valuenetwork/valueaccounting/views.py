@@ -2945,7 +2945,9 @@ def json_customer_orders(request, customer_id):
 
 
 def explore(request):
+    focus = EconomicAgent.objects.get(id=8)
     return render(request, "valueaccounting/explore.html", {
+        "focus": focus,
     })
 
 def unfold_commitment(request, commitment_id):
