@@ -9435,6 +9435,9 @@ class Transfer(models.Model):
             #if self.events. # try to reach the ocp_resource_type and save the related resource_type
             super(Transfer, self).save(*args, **kwargs)
 
+    def save_api(self, *args, **kwargs):
+        super(Transfer, self).save(*args, **kwargs)
+
     def is_reciprocal(self):
         return self.transfer_type.is_reciprocal
 
@@ -12136,7 +12139,7 @@ class EconomicEvent(models.Model):
         #        old_resource = None
         #    else:
         #        has_new_resource = True
-                
+
         resource = self.resource
         if resource:
             #quantity = delta or self.quantity
