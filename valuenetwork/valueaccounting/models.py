@@ -1360,7 +1360,7 @@ class EconomicAgent(models.Model):
           for tx in txs:
             uv = tx.unit_of_value()
             if uv and not uv.ocp_unit_type.id in uids:
-              # mptt: get_ancestors(ascending=False, include_self=False)
+              # get_ancestors(ascending=False, include_self=False)
               #ancs = uv.ocp_unit_type.get_ancestors(False, True)
               #for an in ancs:
               #  if not an.id in uids:
