@@ -44,6 +44,11 @@
                             <div class="nav-collapse">
                                 {% block nav %}
                                         <ul class="nav">
+                                            <li id="mainmap" >
+                                                <a href="{% url "locations" %}" 
+                                                title="{% trans 'Garden Map' %}" 
+                                                >{% trans 'Map' %}</a>
+                                            </li>
                                             <li id="projects" >
                                                 <a href="{% url "projects" %}" 
                                                 title="{% trans 'Networks and Projects' %}" 
