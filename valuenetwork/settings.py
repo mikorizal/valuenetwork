@@ -297,6 +297,8 @@ CAPTCHA_NOISE_FUNCTIONS = (
   'captcha.helpers.noise_dots',
 )
 
+ALLOWED_HOSTS = ["127.0.0.1", "valueflows.pythonanywhere.com"]
+
 # ----put all other settings above this line----
 try:
     from local_settings import *
