@@ -133,15 +133,15 @@
                 marker.name = locName;
                 marker.agents = [];
                 {% for agnt in loc.agents %}
-                    marker.agents.push("{{ agnt.name }}");
+                    var agntUrl = "<a href='{% url "agent" agent_id=agnt.id %}'>{{ agnt.name }}</a>";
+                    marker.agents.push( agntUrl );
                 {% endfor %}
                 marker.resources = [];
                 marker.notes = [];
                 {% for res in loc.resources %}
-                    //var resourceItem = "<li>" + res + "</br>" ;
-                    //resourceItem += "...." + res.notes + "</li>";
-                    //marker.resources.push("{{ resourceItem}}");
-                    marker.resources.push("{{ res }}");
+
+                    var resUrl = "<a href='{% url "resource" resource_id=res.id %}'>{{ res }} {% trans 'quantity' %} {{ res.quantity }} {{ res.unit_of_quantity }} </a>";
+                    marker.resources.push( resUrl );
                     marker.notes.push("{{ res.notes|linebreaksbr }}");
                 {% endfor %}
             {% endif %}
@@ -177,6 +177,7 @@
                 $("#agentList").append("<div>");
                 for (var i = 0; i < agents.length; i++) 
                 {
+                    
                     var agentItem = "<div style='margin-left: 1em;' ><h4>" + agents[i] + "</h4></div>";
                     $("#agentList").append(agentItem);
                 }

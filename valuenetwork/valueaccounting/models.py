@@ -308,7 +308,7 @@ class Location(models.Model):
         return self.description
 
     def resources(self):
-        return self.resources_at_location.all()
+        return self.resources_at_location.all().order_by("resource_type__name")
 
     def agents(self):
         return self.agents_at_location.all()
@@ -2999,10 +2999,16 @@ class EconomicResourceType(models.Model):
         return answer
 
     def can_be_parent(self):
-        if self.own_recipes():
-            #if self.recipe_is_staged():
-            return True
-        return False
+        #Does this restriction make sense?
+        #means only one level of inherited recipes.
+        #import pdb; pdb.set_trace()
+        recipes, inherited = self.own_or_parent_recipes()
+        if recipes:
+            if inherited:
+                return False
+            else:
+                return True
+        return True
 
     def generate_mfg_work_order(self, order_name, due_date, created_by):
         #made from code in view plan_from_recipe but simplified to minimum requirement
