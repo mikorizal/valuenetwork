@@ -154,17 +154,26 @@
             var resources = target.resources;
             var notes = target.notes;
             
+            {% comment %}{% endcomment %}
             $("#changeLocation").empty();
-            
             {% if agent %}
                 var addAgentUrl = target.addAgentUrl;
                 
                 var changeAnchor = '<a href="' + target.locationUrl + '" >{% trans "Change this Location" %}</a>';
+                
+                {% comment %}
                 var addAnchor = '&nbsp;&nbsp;&nbsp;<a href="' + target.addAgentUrl + '" >{% trans "Add me," %} ' + '{{ agent.nick }}' +  '{% trans ", to this Location" %}</a>';
+                {% endcomment %}
+                
                 $("#changeLocation").append(changeAnchor);
+                
+                {% comment %}
                 $("#changeLocation").append(addAnchor);
+                {% endcomment %}
+                
                 $("#changeLocation").show();
             {% endif %}
+            {% comment %}{% endcomment %}
             
             
             $("#agentList").empty();
