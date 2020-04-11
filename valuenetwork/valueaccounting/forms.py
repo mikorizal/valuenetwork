@@ -270,7 +270,7 @@ class EconomicResourceForm(forms.ModelForm):
             'owner',
             'author',
             'custodian',
-            'photo',
+            #'photo',
             #'quantity',
             'quality',
             'independent_demand',

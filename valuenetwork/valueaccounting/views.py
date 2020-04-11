@@ -607,7 +607,7 @@ def agent(request, agent_id):
 
     return render(request, "valueaccounting/agent.html", {
         "agent": agent,
-        "photo_size": (128, 128),
+        "photo_size": (512, 512),
         "change_form": change_form,
         "user_form": user_form,
         "nav_form": nav_form,
@@ -8095,7 +8095,7 @@ def resource(request, resource_id, extra_context=None):
                     limit = resource.spending_limit()
         return render(request, "valueaccounting/digital_currency_resource.html", {
             "resource": resource,
-            "photo_size": (128, 128),
+            "photo_size": (512, 512),
             "role_formset": role_formset,
             "agent": agent,
             "is_owner": is_owner,
@@ -8105,7 +8105,7 @@ def resource(request, resource_id, extra_context=None):
     else:
         return render(request, "valueaccounting/resource.html", {
             "resource": resource,
-            "photo_size": (128, 128),
+            "photo_size": (512, 512),
             "process_add_form": process_add_form,
             "order_form": order_form,
             "role_formset": role_formset,
