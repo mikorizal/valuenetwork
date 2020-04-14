@@ -290,24 +290,28 @@ class EconomicResourceForm(forms.ModelForm):
 
 #used on resource_type page
 class CreateEconomicResourceForm(forms.ModelForm):
-    from_agent = forms.ModelChoiceField(
-        required=False,
-        queryset=EconomicAgent.objects.all(),
-        label="Work done by",
-        help_text="Required only if not logging work inputs",
-        widget=forms.Select(
-            attrs={'class': 'chzn-select'}))
+    #from_agent = forms.ModelChoiceField(
+    #    required=False,
+    #    queryset=EconomicAgent.objects.all(),
+    #    label="Work done by",
+    #    help_text="Required only if not logging work inputs",
+    #    widget=forms.Select(
+    #        attrs={'class': 'chzn-select'}))
     identifier = forms.CharField(
         required=False,
         label="Identifier",
-        help_text="For example, lot number or serial number.",
+        #help_text="For example, lot number or serial number.",
         widget=forms.TextInput(attrs={'class': 'item-name',}))
+    quantity = forms.DecimalField(
+        label=_("Area in sq ft"),
+        widget=forms.TextInput(attrs={'class': 'quantity input-small',}))
     url = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'url input-xxlarge',}))
     photo_url = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'url input-xxlarge',}))
 
     class Meta:
         model = EconomicResource
-        exclude = ('resource_type', 'owner', 'author', 'custodian', 'quality', 'quantity', 'independent_demand', 'order_item', 'stage', 'state', 'value_per_unit_of_use', 'value_per_unit', 'exchange_stage')
+        #exclude = ('resource_type', 'owner', 'author', 'custodian', 'quality', 'quantity', 'independent_demand', 'order_item', 'stage', 'state', 'value_per_unit_of_use', 'value_per_unit', 'exchange_stage')
+        exclude = ('resource_type', 'owner', 'author', 'custodian', 'quality', 'independent_demand', 'order_item', 'stage', 'state', 'value_per_unit_of_use', 'value_per_unit', 'exchange_stage', 'price_per_unit')
 
 #used in process logging
 class ProduceEconomicResourceForm(forms.ModelForm):
