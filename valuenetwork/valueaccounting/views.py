@@ -393,7 +393,7 @@ def new_garden(request):
                 )
             garden.save()
             
-            import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
             
             provider = data['choose_known_provider']
             if not provider:
