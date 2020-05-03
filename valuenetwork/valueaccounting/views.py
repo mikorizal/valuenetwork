@@ -377,8 +377,11 @@ def new_garden(request):
             latitude = data['latitude']
             qty = data['size_in_sq_ft']
             notes = data['description']
+            loc_name = garden_name
+            while Location.objects.filter(name=loc_name):
+                loc_name = loc_name + " location"
             loc = Location(
-                name=garden_name,
+                name=loc_name,
                 address=address,
                 latitude=latitude,
                 longitude=longitude,
