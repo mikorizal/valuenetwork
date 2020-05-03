@@ -296,6 +296,7 @@ class Location(models.Model):
     address = models.CharField(max_length=255, blank=True)
     latitude = models.FloatField(default=0.0, blank=True, null=True)
     longitude = models.FloatField(default=0.0, blank=True, null=True)
+    public = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('name',)
@@ -312,6 +313,13 @@ class Location(models.Model):
 
     def agents(self):
         return self.agents_at_location.all()
+    
+    def garden_providers(self):
+        #hack for gardens
+        gprt = EconomicResourceType.objects.get(name="Garden plot")
+        garden_plots = self.resources().filter(resource_type=gprt)
+        providers = list(set([gp.owner() for gp in garden_plots]))
+        return providers
 
 
 class AgentTypeManager(models.Manager):
@@ -1625,6 +1633,14 @@ class EconomicAgent(models.Model):
             return associations[0]
         else:
             return []
+        
+    def is_associate_of_type_with(self, agent, association_type):
+        answer = None
+        associations = self.is_associate_of.filter(has_associate=agent)
+        if associations:
+            answer = associations.filter(association_type=association_type)
+        return answer
+
 
     def is_manager_of(self, context):
         if self is context:

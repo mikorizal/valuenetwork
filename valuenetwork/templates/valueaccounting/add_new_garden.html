@@ -1,0 +1,192 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap_tags %}
+{% load staticfiles %}
+
+{% block head_title %}{% trans "Add new garden" %}{% endblock %}
+
+{% block extra_head %}
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="{% static 'css/chosen.css' %}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+<link href='https://api.mapbox.com/mapbox.js/v2.2.1/mapbox.css' rel='stylesheet' />
+
+<style>
+
+.help-block {
+  font-style: italic;
+  color: green;
+}
+
+</style>
+
+{% endblock %}
+
+{% block body_class %}locations{% endblock %}
+
+{% block body_base %}
+<div class="container">
+    {% include "_messages.html" %}
+
+    <legend>
+        {% trans "Add new Garden" %} 
+    </legend>
+
+    <div class="row-fluid">
+        <div class="span6">
+            <form id="newGardenForm" method="POST" action="">
+                 {% csrf_token %}
+
+                {{ new_garden_form|as_bootstrap }}
+                
+
+                <input type="submit" name="save" value="{% trans 'Save' %}" class="btn btn-primary" /> 
+
+           </form>
+        </div>
+        <div class="span6">
+            <div id="map" style="width: 98%; height: 600px" ></div>
+
+        </div>
+    </div>
+        
+
+</div>
+{% endblock %}
+{% block extra_script %}
+	<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+	<script src="{% static 'js/chosen.jquery.js' %}"></script>
+	
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+    <script src='https://api.mapbox.com/mapbox.js/v2.2.1/mapbox.js'></script>
+    
+{% endblock %}
+
+{% block extra_body %}
+	{{ block.super }}
+
+    <script type="text/javascript">
+
+    $(document).ready(function(){
+    
+        L.mapbox.accessToken = 'pk.eyJ1IjoiYmhhdWdlbiIsImEiOiIxMjdjMTUzNjNmOWIzNmEwMGUzZjgxYjg4NzZmZTZiYiJ9.2vafy9xqJJRFUGg_O6tAOg';
+
+        var map = L.map('map').setView([{{ latitude }},{{ longitude }}], {{ zoom }});
+        
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://mapbox.com">Mapbox</a>',
+            maxZoom: 18,
+            id: 'bhaugen.3f30d361',
+            accessToken: 'pk.eyJ1IjoiYmhhdWdlbiIsImEiOiIxMjdjMTUzNjNmOWIzNmEwMGUzZjgxYjg4NzZmZTZiYiJ9.2vafy9xqJJRFUGg_O6tAOg'
+        }).addTo(map);
+        
+        // Initialize the geocoder control and add it to the map.
+        /*
+        var geocoderControl = L.mapbox.geocoderControl('mapbox.places');
+        geocoderControl.addTo(map);
+        */
+        
+        var geocoder = L.mapbox.geocoder('mapbox.places');
+
+        $("#id_address").blur(geocodeAddress);
+        
+
+        function geocodeAddress(event) {
+            var address = event.target.value;
+            
+            geocoder.query(address, showMap);
+        }
+        
+        var icon = new L.Icon.Default();
+        icon.options.shadowSize = [0,0];
+        
+        function showMap(err, data) {
+            // The geocoder can return an area, like a city, or a
+            // point, like an address. Here we handle both cases,
+            // by fitting the map bounds to an area or zooming to a point.
+            if (!data.latlng){
+                alert("can't find location");
+            }
+            else
+            {
+                if (data.lbounds) {
+                    map.fitBounds(data.lbounds);
+                } else if (data.latlng) {
+                    map.setView([data.latlng[0], data.latlng[1]], 13);
+                }
+                $(".leaflet-marker-icon").remove(); $(".leaflet-popup").remove();
+                L.marker(data.latlng, {icon : icon}).addTo(map);
+                $("#id_latitude").val(data.latlng[0]);
+                $("#id_longitude").val(data.latlng[1]);
+                //var lat = $("#id_latitude").val();
+                //var lng = $("#id_longitude").val();
+            }
+        }
+
+
+	    $( "#help" ).toggle( function(){
+            $('#help-content').show("slide", { direction: "right" }, "slow" ); 
+        }, function() {
+            $('#help-content').hide("slide", { direction: "right" }, "slow"); 
+        })
+
+        $('.date-entry').datepicker({ dateFormat: "yy-mm-dd" });
+
+        jQuery.validator.setDefaults({ 
+            success: function(label) {
+		        label
+			        .text('').addClass('valid')
+			        .closest('.control-group').addClass('success');
+	        }
+        });
+
+        $(".chzn-select").chosen();
+ 
+        function updateList(event)
+        {
+            $(".chzn-select").trigger("liszt:updated");
+        }
+
+		$( "newGardenForm" ).validate({
+			rules: {
+			    'address': {
+                    required: true
+				},
+				'garden_name': {
+                    required: true
+                },
+			},
+			highlight: function(label) {
+				$(label).closest('.control-group').addClass('error');
+			},
+		});
+		
+        jQuery.validator.addMethod("require_from_group", function(value, element, options) {
+            var selector = options[1];
+            var validOrNot = $(selector, element.form).filter(function() {
+                return $(this).val();
+            }).length >= options[0];
+
+            if(!$(element).data('being_validated')) {
+                var fields = $(selector, element.form);
+                fields.data('being_validated', true);
+                fields.valid();
+                fields.data('being_validated', false);
+            }
+            return validOrNot;
+        }, jQuery.format("Please fill at least {0} of these fields."));     
+        
+        $.validator.addClassRules("known-provider", {require_from_group: [1,".provider-group"]});
+        $.validator.addClassRules("new-provider", {require_from_group: [1,".provider-group"]});
+
+
+    }); // end document.ready
+
+
+
+    </script>
+    
+{% endblock %}

@@ -20,9 +20,9 @@
         {% include "_messages.html" %}
        <div>
     <legend>
-        {% trans "Locations" %}
+        {% trans "Gardens" %}
         {% if agent %}
-            &nbsp;&nbsp;&nbsp;&nbsp; <a href="{% url "create_location" %}">{% trans "Create a new Location" %}</a>
+            &nbsp;&nbsp;&nbsp;&nbsp; <a href="{% url "new_garden" %}">{% trans "Add a new garden" %}</a>
         {% endif %}
     </legend>
 
@@ -115,6 +115,7 @@
             {% if loc.latitude and loc.longitude %}
                 var locName = "{{ loc.name|safe }}";
                 var locAddress = "{{ loc.address }}";
+                var location_id = "{{ loc.id }}";
                 var latlong = [ {{ loc.latitude }}, {{ loc.longitude }}];
                 
                 var content = "<h2>" + locName+ "</h2><p>" + locAddress + "</p>";
@@ -132,8 +133,9 @@
                     marker.addAgentUrl = "";
                 {% endif %}
                 marker.name = locName;
+                marker.location_id = location_id;
                 marker.agents = [];
-                {% for agnt in loc.agents %}
+                {% for agnt in loc.garden_providers %}
                     var agntUrl = "<a href='{% url "agent" agent_id=agnt.id %}'>{{ agnt.name }}</a>";
                     marker.agents.push( agntUrl );
                 {% endfor %}

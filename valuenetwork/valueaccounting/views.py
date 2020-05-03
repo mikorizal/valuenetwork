@@ -360,6 +360,91 @@ def locations(request):
     })
 
 @login_required
+def new_garden(request):
+    
+    new_garden_form = NewGardenForm(data=request.POST or None)
+    
+    latitude = settings.MAP_LATITUDE
+    longitude = settings.MAP_LONGITUDE
+    zoom = settings.MAP_ZOOM
+    
+    if request.method == "POST":
+        if new_garden_form.is_valid():
+            data = new_garden_form.cleaned_data
+            garden_name = data['garden_name']
+            gprt = EconomicResourceType.objects.get(name="Garden plot")
+            address = data['address']
+            latitude = data['latitude']
+            qty = data['size_in_sq_ft']
+            notes = data['description']
+            loc = Location(
+                name=garden_name,
+                address=address,
+                latitude=latitude,
+                longitude=longitude,
+                )
+            loc.save()
+            garden = EconomicResource(
+                resource_type=gprt,
+                identifier=garden_name,
+                quantity=qty,
+                notes=notes,
+                current_location=loc,
+                )
+            garden.save()
+            
+            import pdb; pdb.set_trace()
+            
+            provider = data['choose_known_provider']
+            if not provider:
+                new_provider = data['or_add_new_provider']
+                at = data['new_provider_type']
+                if new_provider:
+                    nick = new_provider
+                    if len(nick) > 30:
+                        nick = nick[:30]
+                    n = 1
+                    while EconomicAgent.objects.filter(nick=nick):
+                        nick = nick + str(n)
+                        n += 1
+                    provider = EconomicAgent(
+                        name=new_provider,
+                        nick=nick,
+                        agent_type=at,
+                        primary_location=loc,
+                        )
+                    provider.save()
+            if provider:
+                eg = EconomicAgent.objects.get(name="Everywhere Gardens")
+                association_type = AgentAssociationType.objects.get(name="Garden Provider")
+                if not provider.is_associate_of_type_with(eg, association_type):
+                    association = AgentAssociation(
+                        is_associate=provider,
+                        has_associate=eg,
+                        association_type=association_type,
+                        )
+                    association.save()
+            owner_roles = AgentResourceRoleType.objects.filter(is_owner=True)
+            if owner_roles:
+                owner = owner_roles[0]
+                ownership = AgentResourceRole(
+                    agent=provider,
+                    resource=garden,
+                    role=owner,
+                    is_contact=True,
+                    )
+                ownership.save()
+            
+            return HttpResponseRedirect("/accounting/locations/")
+            
+    return render(request, "valueaccounting/add_new_garden.html", {
+        "new_garden_form": new_garden_form,
+        "latitude": latitude,
+        "longitude": longitude,
+        "zoom": zoom,
+    })
+
+@login_required
 def create_location(request, agent_id=None):
     agent = None
     if agent_id:
@@ -8191,6 +8276,7 @@ def incoming_value_flows(request, resource_id):
 @login_required
 def change_resource(request, resource_id):
     if request.method == "POST":
+        #import pdb; pdb.set_trace()
         resource = get_object_or_404(EconomicResource, pk=resource_id)
         v_help = None
         if resource.resource_type.unit_of_use:

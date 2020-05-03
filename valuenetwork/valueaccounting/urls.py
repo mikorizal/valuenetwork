@@ -491,6 +491,7 @@ urlpatterns += [
     url(r"^orders/(?P<agent_id>\d+)/$", valuenetwork.valueaccounting.views.orders, name="orders"),
     url(r"^locations/$", valuenetwork.valueaccounting.views.locations, name="locations"),
     url(r"^create-location/$", valuenetwork.valueaccounting.views.create_location, name="create_location"),
+    url(r"^new-garden/$", valuenetwork.valueaccounting.views.new_garden, name="new_garden"),
     url(r"^create-location/(?P<agent_id>\d+)/$", valuenetwork.valueaccounting.views.create_location, name="create_location"),
     url(r"^change-location/(?P<location_id>\d+)/$", valuenetwork.valueaccounting.views.change_location, name="change_location"),
     url(r"^change-location/(?P<location_id>\d+)/(?P<agent_id>\d+)/$", valuenetwork.valueaccounting.views.change_location, name="change_location"),
