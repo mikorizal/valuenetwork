@@ -374,7 +374,8 @@ def new_garden(request):
             garden_name = data['garden_name']
             gprt = EconomicResourceType.objects.get(name="Garden plot")
             address = data['address']
-            latitude = data['latitude']
+            garden_latitude = data['latitude']
+            garden_longitude = data['longitude']
             qty = data['size_in_sq_ft']
             notes = data['description']
             loc_name = garden_name
@@ -383,8 +384,8 @@ def new_garden(request):
             loc = Location(
                 name=loc_name,
                 address=address,
-                latitude=latitude,
-                longitude=longitude,
+                latitude=garden_latitude,
+                longitude=garden_longitude,
                 )
             loc.save()
             garden = EconomicResource(
