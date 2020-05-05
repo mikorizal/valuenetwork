@@ -105,13 +105,15 @@ legend {
                     <a class="indent smaller" href="{% url "context_timeline" context_id=agent.id %}">{% trans "Timeline" %}</a>
                 {% endif %}
             <a class="indent smaller" href="{% url "radial_graph" agent_id=agent.id %}">{% trans "Association Graph" %}</a>
-            <a class="indent smaller" href="{% url "agent_associations" agent_id=agent.id %}">{% trans "Maintain Associations" %}</a>
+            {% if user_agent %}
+                <a class="indent smaller" href="{% url "agent_associations" agent_id=agent.id %}">{% trans "Maintain Associations" %}</a>
+            {% endif %}
             <a class="indent smaller" href="{% url "agents" %}">{% trans "All Agents" %}</a>
 
 		</legend>
 		<div class="button-row">
-
-            {% if user.is_staff %}
+		
+            {% if user_agent %}
                 <a href="#agentChangeForm" role="button" class="btn btn-primary" data-toggle="modal">{% trans "Change" %}</a>
                 {% if use_faircoin and not agent.faircoin_address %}
                     <form
@@ -128,7 +130,7 @@ legend {
                 {% endif %}
             {% endif %}
 
-            {% if user.is_staff and agent.is_deletable %}
+            {% if user_agent and agent.is_deletable %}
                 <form
                     style="display: inline;"
                     class="delete-agent-form indent"
@@ -140,7 +142,7 @@ legend {
                 </form>
             {% endif %}
 
-            {% if user.is_staff and user_form %}
+            {% if user_agent and user_form %}
                 <a href="#createUserForm" role="button" class="btn btn-primary indent" data-toggle="modal">{% trans "Create User" %}</a>
             {% endif %}
 
@@ -171,7 +173,7 @@ legend {
                 </div>
             {% endif %}
 
-            {% if user.is_staff and user_form %}
+            {% if user_agent and user_form %}
                 <div class="modal hide fade" id="createUserForm" tabindex="-1" role="dialog" aria-labelledby="create-user-label" aria-hidden="true">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -181,7 +183,9 @@ legend {
                         <form id="userForm" enctype="multipart/form-data" action="{% url "create_user" agent_id=agent.id %}" method="POST" >
                             {% csrf_token %}
                             {{ user_form|as_bootstrap }}
+                            {% comment %}
                             <input type="checkbox" id="staff" name="is_staff"> <label for="staff">Coop Admin user?</label>
+                            {% endcomment %}
 
                             <div class="modal-footer">
                             <button class="btn" data-dismiss="modal" aria-hidden="true">{% trans "Cancel" %}</button>

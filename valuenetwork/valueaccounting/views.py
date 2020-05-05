@@ -189,16 +189,17 @@ def create_user(request, agent_id):
         if user_form.is_valid():
             user = user_form.save(commit=False)
             user.email = agent.email
-            is_staff = request.POST.get("is_staff")
-            if is_staff == 'on':
-                user.is_staff = True
+            #is_staff = request.POST.get("is_staff")
+            #if is_staff == 'on':
+            #all need to be staff now because of browser
+            # infinite redirect bug
+            user.is_staff = True
             #user.last_login = datetime.datetime.now()
             user.save()
             au = AgentUser(
                 agent = agent,
                 user = user)
             au.save()
-            agent.request_faircoin_address()
     return HttpResponseRedirect('/%s/%s/'
         % ('accounting/agent', agent.id))
 
