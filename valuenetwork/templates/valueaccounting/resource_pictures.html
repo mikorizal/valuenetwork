@@ -1,0 +1,123 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load bootstrap_tags %}
+{% load thumbnail %}
+
+{% block head_title %}{% trans "Pictures of " %}{{ resource }}{% endblock %}
+
+{% block extra_head %}
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+
+<style>
+td {
+    padding: 2px;
+}
+
+.labnote {
+    background-color: beige;
+    padding: 2px 6px 3px 6px;
+    border: 1px solid gainsboro;
+}
+.btn-info {
+    margin-left: 10px;
+}
+.hdg {
+    color: firebrick;
+}
+.btn {
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+#id_notes, #id_access_rules {
+  width: 500px;
+  height: 100px;    
+}
+.modal {
+    width: 600px;
+}
+.text-center {
+    text-align: center;
+}
+</style>
+
+{% endblock %}
+
+{% block body_class %}work{% endblock %}
+
+{% block body_base %}
+    <div class="container">
+        {% include "_messages.html" %}
+
+            <legend>
+                {% trans "Pictures of " %}{{ resource }} &nbsp;
+                {% if agent %}
+                    <a href="#addPictureForm" role="button" class="btn btn-primary" data-toggle="modal">{% trans "Add Picture" %}</a>&nbsp;&nbsp;
+                {% endif %}
+            </legend>
+		
+        {% if agent %}
+            <div class="modal hide fade" id="addPictureForm" tabindex="-1" role="dialog" aria-labelledby="resource-change-label" aria-hidden="true">
+                    <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h3 id="resource-change-label">{% trans "Change" %} {{ resource }}</h3>
+                    </div>
+                    <div class="modal-body">
+                            <form id="add-picture-form" enctype="multipart/form-data" action="{% url "add_resource_picture" resource_id=resource.id %}" method="POST" >
+                                    {% csrf_token %}
+                                    {{ picture_form|as_bootstrap }}
+                                <div class="modal-footer">
+                                        <button class="btn" data-dismiss="modal" aria-hidden="true">{% trans "Cancel" %}</button>
+                                        <button class="btn btn-primary">{% trans "Save" %}</button>
+                                </div>
+                            </form>
+                </div>
+            </div>
+
+        {% endif %}
+
+        {% if pictures %}
+        <div class="row-fluid">
+            <table>
+            {% for pair in pictures %}
+                <tr>
+                    {% for picture in pair %}
+                        <td>
+                            {% if picture.photo %}
+                                <img src="{% thumbnail picture.photo photo_size %}" />
+                                
+                            {% elif picture.photo_url %}
+                                <img src="{{ picture.photo_url }}"/></td>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+             </table>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_script %}
+	<script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+	<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"></script>
+{% endblock %}
+
+
+{% block extra_body %}
+	{{ block.super }}
+
+    <script type="text/javascript">
+
+    $(document).ready(function(){
+
+        $('#inventory').addClass('active');
+		
+    
+    }); // end document.ready
+
+    </script>
+    
+{% endblock %}

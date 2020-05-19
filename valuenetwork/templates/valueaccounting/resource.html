@@ -56,7 +56,13 @@
                 {% endif %}
             {% endif %}
             <a href="{% url "event_history" resource_id=resource.id %}">{% trans "Event history" %}</a>&nbsp;&nbsp;
-            <a href="{% url "incoming_value_flows" resource_id=resource.id %}">{% trans "Incoming Value Flow" %}</a>
+            <a href="{% url "resource_pictures" resource_id=resource.id %}">
+                {% if resource.has_picture %}
+                    {% trans "More pictures" %}
+                {% else %}
+                    {% trans "Pictures" %}
+                {% endif %}
+            </a>
 		</legend>
 		
         {% if agent %}
@@ -66,7 +72,7 @@
 				    <h3 id="resource-change-label">{% trans "Change" %} {{ resource }}</h3>
 			    </div>
 			    <div class="modal-body">
-				    <form id="resource-change-form" action="{% url "change_resource" resource_id=resource.id %}" method="POST" >
+				    <form id="resource-change-form" enctype="multipart/form-data" action="{% url "change_resource" resource_id=resource.id %}" method="POST" >
 					    {% csrf_token %}
 					    {{ resource.change_form|as_bootstrap }}
                         {{ role_formset.management_form }}

@@ -5351,6 +5351,11 @@ class EconomicResource(models.Model):
             return get_url_starter() + self.photo.url
         else:
             return ""
+        
+    def has_picture(self):
+        if self.photo or self.photo_url:
+            return True
+        return False
 
     @property #ValueFlows
     def note(self):
@@ -6867,6 +6872,37 @@ class EconomicResource(models.Model):
         self.stage = prev_stage
         self.save()
         return prev_stage
+    
+
+class ResourcePicture(models.Model):
+    resource = models.ForeignKey(EconomicResource,
+        verbose_name=_('resource'), related_name='resource_pictures')
+    photo = ThumbnailerImageField(_("photo"),
+        upload_to='photos', blank=True, null=True)
+    photo_url = models.CharField(_('photo url'), max_length=255, blank=True)
+    
+    class Meta:
+        ordering = ('resource',)
+        #verbose_name = _('commitment type')
+    
+    def __unicode__(self):
+        if self.photo:
+            picture = self.photo.file.name
+        else:
+            picture = self.photo_url
+        return ', '.join([
+            self.resource.__unicode__(),
+            picture,
+        ])
+    
+    def image(self):
+        if self.photo_url:
+            return self.photo_url
+        elif self.photo:
+            from valuenetwork.valueaccounting.utils import get_url_starter
+            return get_url_starter() + self.photo.url
+        else:
+            return ""
 
 
 class AgentResourceType(models.Model):

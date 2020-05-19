@@ -1165,6 +1165,8 @@ def resource_type(request, resource_type_id):
         create_role_formset = resource_role_agent_formset(prefix="resource")
         if request.method == "POST":
             if create_form.is_valid():
+                data = create_form.cleaned_data
+                #import pdb; pdb.set_trace()
                 resource = create_form.save(commit=False)
                 resource.resource_type = resource_type
                 resource.created_by = request.user
@@ -2349,6 +2351,7 @@ def create_resource_type(request):
         form = EconomicResourceTypeForm(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
+            #import pdb; pdb.set_trace()
             rt = form.save(commit=False)
             rt.created_by=request.user
             rt.save()
@@ -8202,6 +8205,43 @@ def resource(request, resource_id, extra_context=None):
             "agent": agent,
         })
 
+def resource_pictures(request, resource_id):
+    resource = get_object_or_404(EconomicResource, id=resource_id)
+    lst = resource.resource_pictures.all()
+    n = 2
+    #import pdb; pdb.set_trace()
+    pictures = [lst[i:i + n] for i in xrange(0, len(lst), n)]
+    agent = get_agent(request)
+    picture_form = ResourcePictureForm()
+    
+    return render(request, "valueaccounting/resource_pictures.html", {
+        "resource": resource,
+        "photo_size": (512, 512),
+        "picture_form": picture_form,
+        "agent": agent,
+        'pictures': pictures,
+    })
+    
+def add_resource_picture(request, resource_id):
+    resource = get_object_or_404(EconomicResource, id=resource_id)
+    agent = get_agent(request)
+    if request.method == "POST":
+        picture_form = ResourcePictureForm(request.POST, request.FILES)
+        if picture_form.is_valid():
+            data = picture_form.cleaned_data
+            photo = data['photo']
+            photo_url = data['photo_url']
+            #import pdb; pdb.set_trace()
+            if not photo and not photo_url:
+                raise ValidationError(picture_form.errors)
+            
+            pic = picture_form.save(commit=False)
+            pic.resource = resource
+            pic.created_by = request.user
+            pic.save()
+    return HttpResponseRedirect('/%s/%s/'
+        % ('accounting/resource-pictures', resource_id))
+
 
 def resource_role_agent_formset(prefix, data=None):
     RraFormSet = modelformset_factory(
@@ -8286,9 +8326,16 @@ def change_resource(request, resource_id):
         v_help = None
         if resource.resource_type.unit_of_use:
             v_help = "give me a usable widget"
-        form = EconomicResourceForm(data=request.POST, instance=resource, vpu_help=v_help)
+        form = EconomicResourceForm(
+            #request.POST,
+            #request.FILES,
+            instance=resource,
+            data=request.POST, 
+            files=request.FILES,
+            )
         if form.is_valid():
             data = form.cleaned_data
+            #import pdb; pdb.set_trace()
             resource = form.save(commit=False)
             resource.changed_by=request.user
             resource.save()

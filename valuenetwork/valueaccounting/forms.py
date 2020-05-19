@@ -294,6 +294,14 @@ class CreateEconomicResourceForm(forms.ModelForm):
         model = EconomicResource
         #exclude = ('resource_type', 'owner', 'author', 'custodian', 'quality', 'quantity', 'independent_demand', 'order_item', 'stage', 'state', 'value_per_unit_of_use', 'value_per_unit', 'exchange_stage')
         exclude = ('resource_type', 'owner', 'author', 'custodian', 'quality', 'independent_demand', 'order_item', 'stage', 'state', 'value_per_unit_of_use', 'value_per_unit', 'exchange_stage', 'price_per_unit')
+        
+
+class ResourcePictureForm(forms.ModelForm):
+    
+    class Meta:
+        model = ResourcePicture
+        #fields = ('photo', 'photo_url')
+        exclude = ('resource',)
 
 #used in process logging
 class ProduceEconomicResourceForm(forms.ModelForm):
