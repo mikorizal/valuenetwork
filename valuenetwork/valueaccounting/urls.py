@@ -123,6 +123,7 @@ urlpatterns = [
     url(r"^demand/$", valuenetwork.valueaccounting.views.demand, name="demand"),
     url(r"^supply/$", valuenetwork.valueaccounting.views.supply, name="supply"),
     url(r"^work/$", valuenetwork.valueaccounting.views.work, name="work"),
+    url(r"^gardens/$", valuenetwork.valueaccounting.views.gardens, name="gardens"),
     url(r"^schedule/$", valuenetwork.valueaccounting.views.schedule, name="schedule"),
     url(r"^schedule/(?P<context_agent_slug>[-\w]+)/$", valuenetwork.valueaccounting.views.schedule, name="schedule"),
     url(r"^project-stats/(?P<context_agent_slug>[-\w]+)/$", valuenetwork.valueaccounting.views.project_stats, name="project_stats"),

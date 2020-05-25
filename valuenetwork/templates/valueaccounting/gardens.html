@@ -1,0 +1,230 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load bootstrap_tags %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml" lang="en">
+
+<title>{% trans "Gardens" %}</title>
+
+{% block extra_head %}
+<link href="{% static "bootstrap/css/bootstrap.css" %}" rel="stylesheet">
+<link href="{% static "bootstrap/css/bootstrap-responsive.css" %}" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+<link href='https://api.mapbox.com/mapbox.js/v2.2.1/mapbox.css' rel='stylesheet' />
+<style>
+
+</style>
+{% endblock %}
+
+<body>
+    <div class="container">
+        {% include "_messages.html" %}
+       <div>
+    <legend>
+        {% trans "Gardens" %}
+    </legend>
+
+    <div class="row-fluid">
+        <div class="span8">
+            <div id="map" style="width: 98%; height: 600px"></div>
+        </div>
+        
+        <div class="span4">
+            <div id="agents">
+                <i>Click links to see details</i>
+                <h3>{% trans "Providers of" %} 
+                    <span id="agentLocation"></span>
+                </h3>
+                <div id="agentList">
+                </div>
+            </div>
+            <div id="resources" style='margin-top: 1em;'>
+                <h3>{% trans "Resources at" %} 
+                    <span id="resourceLocation"></span>
+                </h3>
+                <div id="resourceList">
+                </div>
+            </div>
+            {% if nolocs %}
+            <h3>{% trans "Locations without map coordinates" %}</h3>
+            <ul>
+                {% for loc in nolocs %}
+                    <li>
+                        {{ loc }} 
+                        {% if agent %}
+                            <a href="{% url "change_location" location_id=loc.id %}" role="button" class="btn btn-info btn-mini" data-toggle="modal" title="Change Location">
+		                           <i class="icon-edit"></i>
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+    
+	</div>
+    </div>
+</body>
+{% block extra_script %}
+    
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+   
+    <script src='https://api.mapbox.com/mapbox.js/v2.2.1/mapbox.js'></script>
+
+{% endblock %}
+
+{% block extra_body %}
+
+    <script type="text/javascript">
+
+	$(document).ready(function(){
+	
+        $( "#help" ).toggle( function(){
+            $('#help-content').show("slide", { direction: "right" }, "slow" ); 
+            $( "#help" ).text("Hide Help");
+        }, function() {
+            $('#help-content').hide("slide", { direction: "right" }, "slow");
+            $( "#help" ).text("Show Help");
+        })
+        
+        L.mapbox.accessToken = 'pk.eyJ1IjoiYmhhdWdlbiIsImEiOiIxMjdjMTUzNjNmOWIzNmEwMGUzZjgxYjg4NzZmZTZiYiJ9.2vafy9xqJJRFUGg_O6tAOg';
+
+        var map = L.map('map')
+            .setView([{{ latitude }},{{ longitude }}], {{ zoom }})
+            //.addControl(L.mapbox.geocoderControl('mapbox.places'))
+            ;
+        
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://mapbox.com">Mapbox</a>',
+            maxZoom: 18,
+            id: 'bhaugen.3f30d361',
+            accessToken: 'pk.eyJ1IjoiYmhhdWdlbiIsImEiOiIxMjdjMTUzNjNmOWIzNmEwMGUzZjgxYjg4NzZmZTZiYiJ9.2vafy9xqJJRFUGg_O6tAOg'
+        }).addTo(map);
+
+        $("#agents").hide();
+        $("#resources").hide();
+
+        {% for loc in locations %}
+            {% if loc.latitude and loc.longitude %}
+                var locName = "{{ loc.name|safe }}";
+                var locAddress = "{{ loc.address }}";
+                var location_id = "{{ loc.id }}";
+                var latlong = [ {{ loc.latitude }}, {{ loc.longitude }}];
+                
+                var content = "<h2>" + locName+ "</h2><p>" + locAddress + "</p>";
+
+                var marker = L.marker(latlong, {title: locName })
+                    .addTo(map).bindPopup(content)
+                    .on('popupopen', showResources)
+                    .on('popupclose', hideResources);
+                
+                {% if agent %}
+                    marker.locationUrl = "{% url "change_location" location_id=loc.id %}";
+                    marker.addAgentUrl = "{% url "add_agent_to_location" location_id=loc.id agent_id=agent.id %}";
+                {% else %}
+                    marker.locationUrl = "";
+                    marker.addAgentUrl = "";
+                {% endif %}
+                marker.name = locName;
+                marker.location_id = location_id;
+                marker.agents = [];
+                {% for agnt in loc.garden_providers %}
+                    var agntUrl = "<a href='{% url "agent" agent_id=agnt.id %}'>{{ agnt.name }}</a>";
+                    marker.agents.push( agntUrl );
+                {% endfor %}
+                marker.resources = [];
+                marker.notes = [];
+                {% for res in loc.resources %}
+
+                    var resUrl = "<a href='{% url "resource" resource_id=res.id %}'>{{ res }} {% trans 'quantity' %} {{ res.quantity }} {{ res.unit_of_quantity }} </a>";
+                    marker.resources.push( resUrl );
+                    marker.notes.push('{{ res.notes|urlize|linebreaksbr }}');
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        
+        function showResources(event) {
+            var target = event.target;
+            var location_id = target.location_id
+            var agents = target.agents;
+            var resources = target.resources;
+            var notes = target.notes;
+
+            
+            {% comment %}
+            $("#changeLocation").empty();
+            {% if agent %}
+                var addAgentUrl = target.addAgentUrl;
+                
+                var changeAnchor = '<a href="' + target.locationUrl + '" >{% trans "Change this Location" %}</a>';
+                var addAnchor = '&nbsp;&nbsp;&nbsp;<a href="' + target.addAgentUrl + '" >{% trans "Add me," %} ' + '{{ agent.nick }}' +  '{% trans ", to this Location" %}</a>';
+             
+                $("#changeLocation").append(changeAnchor);
+                
+                $("#changeLocation").append(addAnchor);
+                
+                $("#changeLocation").show();
+            {% endif %}
+            {% endcomment %}
+            
+            
+            $("#agentList").empty();
+            $("#resourceList").empty();
+            
+            
+            if (agents.length)
+            {  
+                $("#agentLocation").text(target.name);
+                $("#agentList").append("<div>");
+                for (var i = 0; i < agents.length; i++) 
+                {
+                    
+                    var agentItem = "<div style='margin-left: 1em;' ><h4>" + agents[i] + "</h4></div>";
+                    $("#agentList").append(agentItem);
+                }
+                $("#agentList").append("</div>");
+                $("#agents").show();
+            }
+            
+            
+            if (resources.length)
+            {  
+                $("#resourceLocation").text(target.name);
+                $("#resourceList").append("<div>");
+                for (var i = 0; i < resources.length; i++) 
+                {
+                    var resource = resources[i];
+                    var note = notes[i];
+                   //var notes = resource.notes;
+                    var resourceItem = "<div style='margin-left: 1em;' ><h4>" + resource + "</h4></div>" ;
+                    resourceItem += "<div style='margin-left: 2em;'>" + note  + "</div>" ;
+                    //var resourceItem = "<li>" + resource + "</br>" ;
+                    //resourceItem += "...." + notes + "</li>";
+                    $("#resourceList").append(resourceItem);
+                }
+                $("#resourceList").append("</div>");
+                $("#resources").show();
+            }
+        }
+        
+        function hideResources(event) {
+            //var resourceItem = "<li>" + resource + "</br>" ;
+            //$("#changeLocation").hide();
+            $("#agents").hide();
+            $("#resources").hide();
+        }
+
+	}); // end document.ready
+
+     
+    </script>
+/*
+{% endblock %}
+
+</html>

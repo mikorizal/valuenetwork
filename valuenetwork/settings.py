@@ -86,6 +86,7 @@ LOGIN_EXEMPT_URLS = [
     r'^captcha/image/',
     r'^i18n/',
     r'^robots.txt$',
+    r'^accounting/gardens/',
 ]
 
 

@@ -360,6 +360,22 @@ def locations(request):
         "help": get_help("locations"),
     })
 
+def gardens(request):
+    #import pdb; pdb.set_trace()
+    locations = Location.objects.all()
+    nolocs = Location.objects.filter(latitude=0.0)
+    latitude = settings.MAP_LATITUDE
+    longitude = settings.MAP_LONGITUDE
+    zoom = settings.MAP_ZOOM
+    return render(request, "valueaccounting/gardens.html", {
+        "locations": locations,
+        "nolocs": nolocs,
+        "latitude": latitude,
+        "longitude": longitude,
+        "zoom": zoom,
+        #"help": get_help("gardens"),
+    })
+
 @login_required
 def new_garden(request):
     
