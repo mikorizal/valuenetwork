@@ -5360,6 +5360,11 @@ class EconomicResource(models.Model):
     @property #ValueFlows
     def note(self):
         return self.notes
+    
+    @property
+    def urlized_notes(self):
+        from django.utils.html import urlize
+        return urlize(self.notes)
 
     @property #ValueFlows
     def tracking_identifier(self):

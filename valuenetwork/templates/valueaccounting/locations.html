@@ -145,7 +145,7 @@
 
                     var resUrl = "<a href='{% url "resource" resource_id=res.id %}'>{{ res }} {% trans 'quantity' %} {{ res.quantity }} {{ res.unit_of_quantity }} </a>";
                     marker.resources.push( resUrl );
-                    marker.notes.push("{{ res.notes|linebreaksbr }}");
+                    marker.notes.push('{{ res.notes|urlize|linebreaksbr }}');
                 {% endfor %}
             {% endif %}
         {% endfor %}
@@ -204,7 +204,7 @@
                     var note = notes[i];
                    //var notes = resource.notes;
                     var resourceItem = "<div style='margin-left: 1em;' ><h4>" + resource + "</h4></div>" ;
-                    resourceItem += "<div style='margin-left: 2em;'>" + note + "</div>" ;
+                    resourceItem += "<div style='margin-left: 2em;'>" + note  + "</div>" ;
                     //var resourceItem = "<li>" + resource + "</br>" ;
                     //resourceItem += "...." + notes + "</li>";
                     $("#resourceList").append(resourceItem);
