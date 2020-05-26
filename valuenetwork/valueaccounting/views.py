@@ -360,6 +360,8 @@ def locations(request):
         "help": get_help("locations"),
     })
 
+from django.views.decorators.clickjacking import xframe_options_exempt
+@xframe_options_exempt
 def gardens(request):
     #import pdb; pdb.set_trace()
     locations = Location.objects.all()
