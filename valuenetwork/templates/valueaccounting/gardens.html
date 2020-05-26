@@ -5,7 +5,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="https://www.w3.org/1999/xhtml" lang="en">
 
-<title>{% trans "Gardens" %}</title>
+<title>{% trans "Everywhere Gardens" %}</title>
 
 {% block extra_head %}
 <link href="{% static "bootstrap/css/bootstrap.css" %}" rel="stylesheet">
@@ -23,7 +23,7 @@
         {% include "_messages.html" %}
        <div>
     <legend>
-        {% trans "Gardens" %}
+        {% trans "Everywhere Gardens" %}
     </legend>
 
     <div class="row-fluid">
@@ -33,7 +33,6 @@
         
         <div class="span4">
             <div id="agents">
-                <i>Click links to see details</i>
                 <h3>{% trans "Providers of" %} 
                     <span id="agentLocation"></span>
                 </h3>
